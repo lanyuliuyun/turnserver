@@ -2547,6 +2547,38 @@ static int turnserver_process_allocate_request(int transport_protocol, int sock,
         TURN_MAX_ALLOCATION_LIFETIME);
   }
 
+ #if 1
+  {
+      struct sockaddr_storage local_addr;
+      struct sockaddr_storage null_addr;
+      socklen_t local_addr_len = sizeof(local_addr);
+      (void)family_address;
+
+      if (transport_protocol == IPPROTO_UDP)
+      {
+        connect(sock, saddr, saddr_size);
+        getsockname(sock, (struct sockaddr*)&local_addr, &local_addr_len);
+
+        memset(&null_addr, 0, sizeof(null_addr));
+        null_addr.ss_family = AF_UNSPEC;
+        connect(sock, (struct sockaddr*)&null_addr, sizeof(null_addr));
+      }
+      else
+      {
+        getsockname(sock, (struct sockaddr*)&local_addr, &local_addr_len);
+      }
+
+      if (local_addr.ss_family == AF_INET)
+      {
+        strncpy(str, inet_ntop(AF_INET, &((struct sockaddr_in*)&local_addr)->sin_addr, str, INET6_ADDRSTRLEN), INET6_ADDRSTRLEN-1);
+      }
+      else /* if (local_addr.ss_family == AF_INET6) */
+      {
+          strncpy(str, inet_ntop(AF_INET6, &((struct sockaddr_in6*)&local_addr)->sin6_addr, str, INET6_ADDRSTRLEN), INET6_ADDRSTRLEN-1);
+      }
+      str[INET6_ADDRSTRLEN - 1] = 0x00;
+  }
+ #else
   /* RFC6156 */
   if(message->requested_addr_family)
   {
@@ -2593,6 +2625,7 @@ static int turnserver_process_allocate_request(int transport_protocol, int sock,
 
   strncpy(str, family_address, INET6_ADDRSTRLEN);
   str[INET6_ADDRSTRLEN - 1] = 0x00;
+ #endif
 
   /* after all these checks, allocate an allocation! */
 

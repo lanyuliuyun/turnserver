@@ -1,3 +1,6 @@
+2018-02-01 lanyuliuyun <lanyuliuyun@foxmail.com>
+    * Version 0.7.4     - fix improper relay address allocation when listening at multiple address
+
 2013-06-14	Sebastien Vincent <sebastien.vincent@turnserver.org>
 
 	* Version 0.7.3		 - Minor fix to be able to compile with recent glibc.
